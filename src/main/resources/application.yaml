@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: auth-app-backend
+
+  profiles:
+    active: qa
+
+  server:
+    port: 8082
