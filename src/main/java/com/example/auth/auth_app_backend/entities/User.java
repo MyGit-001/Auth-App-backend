@@ -26,6 +26,7 @@ public class User {
     @Column(name = "user_name")
     private String name;
     private String password;
+    @Column(name = "user_img")
     private String image;
     private boolean enable;
     private Instant createdAt = Instant.now();
