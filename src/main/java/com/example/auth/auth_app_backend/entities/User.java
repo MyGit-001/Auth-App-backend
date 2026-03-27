@@ -42,4 +42,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "roles_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @PrePersist
+    protected void onCreate(){
+        Instant now = Instant.now();
+        if(createdAt == null)  createdAt = now;
+
+        updatedAt  = now;
+    }
 }
