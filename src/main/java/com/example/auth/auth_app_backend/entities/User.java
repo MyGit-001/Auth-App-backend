@@ -43,11 +43,16 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
+    //Tracks Entity Lifecycle
     @PrePersist
     protected void onCreate(){
         Instant now = Instant.now();
         if(createdAt == null)  createdAt = now;
-
         updatedAt  = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate(){
+        updatedAt = Instant.now();
     }
 }
