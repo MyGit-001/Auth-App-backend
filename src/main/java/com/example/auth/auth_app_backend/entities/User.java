@@ -32,6 +32,8 @@ public class User {
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 
+    @Enumerated(EnumType.STRING)
     private Provider provider = Provider.LOCAL;
+
     private Set<Role> roles = new HashSet<>();
 }
