@@ -15,6 +15,7 @@ import java.util.UUID;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "role_id")
     private UUID id = UUID.randomUUID();
 
     @Column(unique = true, nullable = false)
