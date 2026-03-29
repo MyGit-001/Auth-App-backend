@@ -34,4 +34,4 @@ Before you fix anything, you need to see where you are.
 
 ## ✅ When to use which
 * Use **git revert** when: the bad commit is already pushed and other people may have based work on it; you want a safe, auditable undo. 
-* Use **git reset** --hard when: you are certain you want to discard local commits and uncommitted changes, and you either are the only one working on the branch or you coordinate with teammates before force-pushing. 
+* Use **git reset --hard** when: you are certain you want to discard local commits and uncommitted changes, and you either are the only one working on the branch or you coordinate with teammates before force-pushing. 
