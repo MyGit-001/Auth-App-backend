@@ -4,7 +4,7 @@ I’ll admit it, I’ve always found Git confusing. I only committed my code "fo
 I ran into a nightmare scenario 😱 --> A Spring Boot starter parent version downgrade (4.0.3 to 3.2.5) triggered a waterfall of annotation errors.  \
 IntelliJ stopped recognizing my App.java as the root. I spent hours clearing caches, deleting .idea folders, and tweaking Maven settings based on Gemini AI suggestions. Nothing worked by the way it was gemini who told me to change the version 😑
 
-Frustrated and ready to give up bothh myself 😣 and Gemini 🤖, I realized now I just wanted to go back to when things actually worked. 
+Frustrated and ready to give up both myself 😣 and Gemini 🤖, I realized now I just wanted to go back to the prev point of my project which actually worked. 
 
 The lesson: I finally looked into how to actually "revert" using Git. I discovered that what I thought was a complex tool is actually a massive safety net. For the first time, Git wasn't a chore—it was the "undo" button I desperately needed. \
 📢 _If you’re avoiding Git because it feels like extra work, take it from me: You’re not just managing code --> you’re buying insurance for your sanity._
