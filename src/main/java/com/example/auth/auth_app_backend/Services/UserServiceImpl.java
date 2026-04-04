@@ -4,6 +4,7 @@ import com.example.auth.auth_app_backend.dtos.UserDto;
 import com.example.auth.auth_app_backend.entities.Provider;
 import com.example.auth.auth_app_backend.entities.User;
 import com.example.auth.auth_app_backend.repositories.UserRepo;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class UserServiceImpl implements UserService{
         this.modelMapper = modelMapper;
     }
 
+    @Transactional
     @Override
     public UserDto createUser(UserDto userDto){
         if(userDto.getEmail()==null || userDto.getEmail().isBlank()) {
@@ -49,12 +51,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserDto getUserByEmail(String email) {
-        return null;
-    }
+    public UserDto getUserByEmail(String email) { return null;}
 
     @Override
+    @Transactional
     public Iterable<UserDto> getAllUsers() {
-        return null;
+        return userRepo
+                .findAll()
+                .stream()
+                .map(user -> modelMapper.map(user , UserDto.class))
+                .toList();
     }
 }
