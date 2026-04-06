@@ -37,7 +37,7 @@ Before you fix anything, you need to see where you are.
 * Use **git reset --hard** when: you are certain you want to discard local commits and uncommitted changes, and you either are the only one working on the branch or you coordinate with teammates before force-pushing.
 
 
-Let's see Global Exception Handling for REST APIs
+# Let's see Global Exception Handling for REST APIs
 The Step-by-Step Flow
 Here is what happens when you request a user with an email that does not exist in the database.
 Step 1: The API Call is Made
