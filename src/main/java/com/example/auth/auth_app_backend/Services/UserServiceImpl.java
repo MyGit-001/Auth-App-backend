@@ -3,8 +3,10 @@ package com.example.auth.auth_app_backend.Services;
 import com.example.auth.auth_app_backend.dtos.UserDto;
 import com.example.auth.auth_app_backend.entities.Provider;
 import com.example.auth.auth_app_backend.entities.User;
+import com.example.auth.auth_app_backend.exceptions.ResourceNotFoundException;
 import com.example.auth.auth_app_backend.repositories.UserRepo;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Null;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +44,6 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void deleteUser(String id) {
-
     }
 
     @Override
@@ -51,7 +52,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserDto getUserByEmail(String email) { return null;}
+    public UserDto getUserByEmail(String email) {
+        User user = userRepo.findByEmail(email).orElseThrow( ()->new ResourceNotFoundException("User not found with Email ID"));
+        return modelMapper.map(user , UserDto.class);
+    }
 
     @Override
     @Transactional
