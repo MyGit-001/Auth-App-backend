@@ -1,4 +1,4 @@
-## 👉 I used to hate Git. Today, it saved my project.
+# 👉 I used to hate Git. Today, it saved my project.
 
 I’ll admit it, I’ve always found Git confusing. I only committed my code "for namesake" because I thought I had to. That changed today. \
 I ran into a nightmare scenario 😱 --> A Spring Boot starter parent version downgrade (4.0.3 to 3.2.5) triggered a waterfall of annotation errors.  \
