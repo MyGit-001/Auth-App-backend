@@ -15,4 +15,11 @@ public class GlobalExceptionHandler {
                , "Resource Not Found" );
        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception){
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage() , HttpStatus.BAD_REQUEST
+                , "Resource Not Found" );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 }
