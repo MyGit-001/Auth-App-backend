@@ -1,4 +1,4 @@
-## 👉 I used to hate Git. Today, it saved my project.
+# 👉 I used to hate Git. Today, it saved my project.
 
 I’ll admit it, I’ve always found Git confusing. I only committed my code "for namesake" because I thought I had to. That changed today. \
 I ran into a nightmare scenario 😱 --> A Spring Boot starter parent version downgrade (4.0.3 to 3.2.5) triggered a waterfall of annotation errors.  \
@@ -34,4 +34,106 @@ Before you fix anything, you need to see where you are.
 
 ## ✅ When to use which
 * Use **git revert** when: the bad commit is already pushed and other people may have based work on it; you want a safe, auditable undo. 
-* Use **git reset --hard** when: you are certain you want to discard local commits and uncommitted changes, and you either are the only one working on the branch or you coordinate with teammates before force-pushing. 
+* Use **git reset --hard** when: you are certain you want to discard local commits and uncommitted changes, and you either are the only one working on the branch or you coordinate with teammates before force-pushing.
+
+
+# Let's see Global Exception Handling for REST APIs 
+The Step-by-Step Flow \
+Here is what happens when you request a user with an email that does not exist in the database. 
+### Step 1: The API Call is Made 
+You go into Postman and make a GET request to an endpoint like: GET /api/v1/users/emailId/user-does-not-exist@example.com 
+### Step 2: The UserController Receives the Request 
+Spring sees the URL and directs the request to the correct method in your UserController.
+
+```Java
+// UserController.java
+
+@GetMapping("/emailId/{emailId}")
+public ResponseEntity<UserDto> getUserByEmail(@PathVariable("emailId") String emailId) {
+    // The controller's only job is to delegate. It calls the service.
+    // It has no idea if the user exists or not.
+    return ResponseEntity.ok(userService.getUserByEmail(emailId));
+}
+```
+
+The controller immediately calls the getUserByEmail method in your UserServiceImpl, passing along the email address. 
+### Step 3: The UserServiceImpl Does the Work (and Finds a Problem) 
+Now we are in the "workshop". The service tries to find the user.
+
+```Java
+// UserServiceImpl.java
+
+@Override
+public UserDto getUserByEmail(String email) {
+    // 1. The service asks the repository to find a user by email.
+    //    The database finds nothing, so the repository returns an empty Optional.
+    User user = userRepo.findByEmail(email)
+        
+        // 2. The .orElseThrow() method is now triggered because the Optional is empty.
+        .orElseThrow(() -> new ResourceNotFoundException("User not found with Email ID")); // <-- THE EXCEPTION IS THROWN!
+
+    // 3. IMPORTANT: The code below this line is NEVER executed.
+    //    The method stops immediately and throws the exception "upstairs".
+    return modelMapper.map(user, UserDto.class);
+}
+```
+
+This is the most critical moment. The throw keyword acts like a fire alarm. It immediately stops the normal flow of the getUserByEmail method. The method does not return a UserDto. Instead, it "throws" the ResourceNotFoundException object up to whatever called it (which was the UserController).
+### Step 4: The Exception Reaches the GlobalExceptionHandler 
+The ResourceNotFoundException object now "bubbles up". The UserController doesn't know what to do with it (it has no try-catch block), so the exception continues traveling upwards. \
+This is where your Emergency Manager steps in. \
+The @RestControllerAdvice annotation on your GlobalExceptionHandler tells Spring: "I am a special component that watches over all controllers. If any unhandled exception bubbles up, let me see it first!" \
+Spring shows the ResourceNotFoundException to your GlobalExceptionHandler. The handler looks at its methods and finds a perfect match: 
+
+```Java
+// GlobalExceptionHandler.java
+
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    // This annotation says: "I am the method that handles ResourceNotFoundException!"
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException exception) {
+        // ... The code to handle the error goes here ...
+    }
+}
+```
+
+Because it found a matching handler, the application does not crash. Your handler takes control of the entire process. 
+### Step 5: The Handler Crafts a Beautiful Response 
+Your handler method now executes. The exception object it receives as a parameter is the exact same one you created in your service. 
+
+```Java
+// GlobalExceptionHandler.java
+
+@ExceptionHandler(ResourceNotFoundException.class)
+public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException exception) {
+    
+    // 1. Get the message from the exception you threw earlier.
+    String message = exception.getMessage(); // "User not found with Email ID"
+
+    // 2. Create a clean, structured ErrorResponse object.
+    ErrorResponse errorResponse = new ErrorResponse(message, 404, "Resource Not Found");
+
+    // 3. Build a full ResponseEntity package, setting the HTTP status to 404
+    //    and putting your ErrorResponse object in the body.
+    return ResponseEntity.status(404).body(errorResponse);
+}
+```
+
+### Step 6: The Final Response is Sent to the Client 
+Spring takes the ResponseEntity your handler created, converts the ErrorResponse object into a JSON string, and sends it back to Postman. \
+What you see in Postman is: 
+• Status: 404 Not Found
+• Body:  JSON  
+```JSON
+	{
+        "message": "User not found with Email ID",
+        "statusCode": 404,
+        "details": "Resource Not Found"
+    }
+```
+
+<img width="897" height="382" alt="image" src="https://github.com/user-attachments/assets/87734795-0c0b-46aa-ba93-a18380832b9b" />
+
