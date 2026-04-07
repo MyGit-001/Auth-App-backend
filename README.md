@@ -37,12 +37,12 @@ Before you fix anything, you need to see where you are.
 * Use **git reset --hard** when: you are certain you want to discard local commits and uncommitted changes, and you either are the only one working on the branch or you coordinate with teammates before force-pushing.
 
 
-# Let's see Global Exception Handling for REST APIs
-The Step-by-Step Flow
-Here is what happens when you request a user with an email that does not exist in the database.
-Step 1: The API Call is Made
-You go into Postman and make a GET request to an endpoint like: GET /api/v1/users/emailId/user-does-not-exist@example.com
-Step 2: The UserController Receives the Request
+# Let's see Global Exception Handling for REST APIs 
+The Step-by-Step Flow \
+Here is what happens when you request a user with an email that does not exist in the database. 
+### Step 1: The API Call is Made 
+You go into Postman and make a GET request to an endpoint like: GET /api/v1/users/emailId/user-does-not-exist@example.com 
+### Step 2: The UserController Receives the Request 
 Spring sees the URL and directs the request to the correct method in your UserController.
 
 ```Java
@@ -56,8 +56,8 @@ public ResponseEntity<UserDto> getUserByEmail(@PathVariable("emailId") String em
 }
 ```
 
-The controller immediately calls the getUserByEmail method in your UserServiceImpl, passing along the email address.
-Step 3: The UserServiceImpl Does the Work (and Finds a Problem)
+The controller immediately calls the getUserByEmail method in your UserServiceImpl, passing along the email address. 
+### Step 3: The UserServiceImpl Does the Work (and Finds a Problem) 
 Now we are in the "workshop". The service tries to find the user.
 
 ```Java
@@ -79,11 +79,11 @@ public UserDto getUserByEmail(String email) {
 ```
 
 This is the most critical moment. The throw keyword acts like a fire alarm. It immediately stops the normal flow of the getUserByEmail method. The method does not return a UserDto. Instead, it "throws" the ResourceNotFoundException object up to whatever called it (which was the UserController).
-Step 4: The Exception Reaches the GlobalExceptionHandler
-The ResourceNotFoundException object now "bubbles up". The UserController doesn't know what to do with it (it has no try-catch block), so the exception continues traveling upwards.
-This is where your Emergency Manager steps in.
-The @RestControllerAdvice annotation on your GlobalExceptionHandler tells Spring: "I am a special component that watches over all controllers. If any unhandled exception bubbles up, let me see it first!"
-Spring shows the ResourceNotFoundException to your GlobalExceptionHandler. The handler looks at its methods and finds a perfect match:
+### Step 4: The Exception Reaches the GlobalExceptionHandler 
+The ResourceNotFoundException object now "bubbles up". The UserController doesn't know what to do with it (it has no try-catch block), so the exception continues traveling upwards. \
+This is where your Emergency Manager steps in. \
+The @RestControllerAdvice annotation on your GlobalExceptionHandler tells Spring: "I am a special component that watches over all controllers. If any unhandled exception bubbles up, let me see it first!" \
+Spring shows the ResourceNotFoundException to your GlobalExceptionHandler. The handler looks at its methods and finds a perfect match: 
 
 ```Java
 // GlobalExceptionHandler.java
@@ -100,9 +100,9 @@ public class GlobalExceptionHandler {
 }
 ```
 
-Because it found a matching handler, the application does not crash. Your handler takes control of the entire process.
-Step 5: The Handler Crafts a Beautiful Response
-Your handler method now executes. The exception object it receives as a parameter is the exact same one you created in your service.
+Because it found a matching handler, the application does not crash. Your handler takes control of the entire process. 
+### Step 5: The Handler Crafts a Beautiful Response 
+Your handler method now executes. The exception object it receives as a parameter is the exact same one you created in your service. 
 
 ```Java
 // GlobalExceptionHandler.java
@@ -122,9 +122,9 @@ public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNot
 }
 ```
 
-Step 6: The Final Response is Sent to the Client
-Spring takes the ResponseEntity your handler created, converts the ErrorResponse object into a JSON string, and sends it back to Postman.
-What you see in Postman is:
+### Step 6: The Final Response is Sent to the Client 
+Spring takes the ResponseEntity your handler created, converts the ErrorResponse object into a JSON string, and sends it back to Postman. \
+What you see in Postman is: 
 • Status: 404 Not Found
 • Body:  JSON  
 ```JSON
