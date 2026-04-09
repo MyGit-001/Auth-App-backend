@@ -145,7 +145,7 @@ What you see in Postman is:
 
 <img width="897" height="382" alt="image" src="https://github.com/user-attachments/assets/87734795-0c0b-46aa-ba93-a18380832b9b" />
 
-## Similarily, handling the exceptions for the createUser class where throwing IllegalArgumentException \
+## Similarily, handling the exceptions for the createUser class where throwing IllegalArgumentException 
 If no email was inputtted by the user --> "Email is required" \
 If email already exists in the database --> "Email already exists"
 
@@ -174,3 +174,11 @@ Now defining the handler for IllegalArgumentException in Global handler, We have
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 ```
+API reposne if user was attepmpted to created with an already existing email Id. 
+<img width="925" height="530" alt="image" src="https://github.com/user-attachments/assets/c27a30db-eeea-4df9-a6b8-9f9004e2927c" />
+
+API reposne if user was attepmpted to be created without an email Id. 
+<img width="907" height="550" alt="image" src="https://github.com/user-attachments/assets/e08c7fc7-c882-4847-bb11-ee357549e52c" />
+
+
+
