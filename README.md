@@ -121,6 +121,14 @@ public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNot
     return ResponseEntity.status(404).body(errorResponse);
 }
 ```
+Our ErrorResponse is a record in out dTos which looks like this,
+```Java
+public record ErrorResponse(
+        String message,
+        HttpStatus status,
+        String error) {
+}
+```
 
 ### Step 6: The Final Response is Sent to the Client 
 Spring takes the ResponseEntity your handler created, converts the ErrorResponse object into a JSON string, and sends it back to Postman. \
@@ -137,3 +145,32 @@ What you see in Postman is:
 
 <img width="897" height="382" alt="image" src="https://github.com/user-attachments/assets/87734795-0c0b-46aa-ba93-a18380832b9b" />
 
+## Similarily, handling the exceptions for the createUser class where throwing IllegalArgumentException \
+If no email was inputtted by the user --> "Email is required" \
+If email already exists in the database --> "Email already exists"
+
+```java 
+public UserDto createUser(UserDto userDto){
+        if(userDto.getEmail()==null || userDto.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if(userRepo.existsByEmail(userDto.getEmail())){
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        User user = modelMapper.map(userDto , User.class);
+        user.setProvider(userDto.getProvider()!=null ? userDto.getProvider() : Provider.LOCAL);
+        User savedUser = userRepo.save(user);
+        return modelMapper.map(savedUser , UserDto.class);
+    }
+```
+Now defining the handler for IllegalArgumentException in Global handler, We have already defined the ErrorResponse record, so just passing the argument to it and returning it with ResponseEntity)
+
+```Java
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception){
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage() , HttpStatus.BAD_REQUEST
+                , "Resource Not Found" );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+```
