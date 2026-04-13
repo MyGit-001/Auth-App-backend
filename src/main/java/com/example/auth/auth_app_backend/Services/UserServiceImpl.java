@@ -42,7 +42,17 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserDto updateUser(UserDto userDto, String userId) {
-        return null;
+        UUID id = UserHelper.parseUUID(userId);
+        User existUser = userRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("User not found by ID"));
+        //No changes in email
+        if(userDto.getName() != null) existUser.setName(userDto.getName());
+        if(userDto.getImage() != null) existUser.setImage(userDto.getImage());
+        if(userDto.getProvider() != null) existUser.setProvider(userDto.getProvider());
+        // TODO: Change password updation logic...
+        if(userDto.getPassword() != null) existUser.setPassword(userDto.getPassword());
+        existUser.setEnable(userDto.isEnable());
+        User updatedUser = userRepo.save(existUser);
+        return modelMapper.map(updatedUser , UserDto.class) ;
     }
 
     @Override
