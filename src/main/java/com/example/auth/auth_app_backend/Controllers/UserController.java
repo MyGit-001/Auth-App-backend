@@ -32,6 +32,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByEmail(emailId));
     }
 
+    //Get User with given Id
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable("userId") String userId){
+        return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
     //delete user
     // /api/v1/users/{userId}
     @DeleteMapping("/{userId}")
