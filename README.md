@@ -240,6 +240,7 @@ The Spring Security framework sees that the context is authenticated and allows 
 If the client tries to access a protected API without a token, the custom filter cannot verify them. \
 The SecurityContextHolder remains unauthenticated (empty), and Spring Security blocks the request, returning an unauthorized error. 
 
+
 ---
 ## Understanding Stateful and Stateless
 
@@ -256,3 +257,6 @@ In a stateless system, the server retains zero memory of past requests. Every si
 • **The next click:** When you click "View Profile," you must hand the server the entire JWT. The server looks at it, does the math to verify the signature is real, serves your profile, and forgets you again. \
 • **Pros:** It is incredibly scalable. You can have 10 million users, and the server uses zero extra memory because the users are carrying their own ID badges (the tokens). It's also great for microservices—any server can verify the math without needing access to a central session database. \
 • **Cons:** As we talked about earlier, the "Logout Problem." Because the server doesn't have a filing cabinet to cross your name out of, it can't easily invalidate a token before its expiration time runs out. 
+
+
+
