@@ -191,25 +191,26 @@ JWT authentication provides a more secure, stateless way to authenticate API req
 2. What is a JWT?
 A JWT is an encoded string that securely transmits information between parties. It consists of three parts separated by dots (.): \
 • Header: Contains metadata like the type of token (JWT) and the encryption algorithm used.
+
 • Payload (Claims): Contains the actual data/information you want to store (e.g., User ID, roles, issue date). Note: Do not put sensitive data like passwords here, as it can be decoded by anyone.
 • Signature: The most critical part. It is created using the encoded header, encoded payload, and a secret key. It ensures the token has not been tampered with and verifies the sender's identity.
 
-3. The JWT Workflow (Client & Backend Interaction)
+4. The JWT Workflow (Client & Backend Interaction)
    
 ### Scenario A: Generating the Token (Login)
 The client (e.g., React app) sends the username and password to a dedicated login API endpoint. \
-The backend validates the credentials using the AuthenticationManager -> AuthenticationProvider -> UserDetailsService (checking against the database). \
-If valid, a JwtService generates a JWT token containing the user's information. \
+The backend validates the credentials using the `AuthenticationManager -> AuthenticationProvider -> UserDetailsService (checking against the database)`. \
+If valid, a `JwtService` generates a JWT token containing the user's information. \
 The backend sends this token back to the client as a response. \
 The client stores the token (e.g., in Local Storage).
 
 ### Scenario B: Accessing Protected APIs
 The client sends a request to a protected API and includes the JWT token (usually in the Authorization header). \
-A custom JWT Authentication Filter on the backend intercepts the request and extracts the token. \
+A custom `JWT Authentication Filter` on the backend intercepts the request and extracts the token. \
 The filter verifies the token's signature. \
-If verified, the filter creates an Authentication object and sets it in the SecurityContextHolder. \
-The Spring Security framework sees that the context is authenticated and allows the request to proceed to the protected API. \
+If verified, the filter creates an Authentication object and sets it in the `SecurityContextHolder`. \
+The Spring Security framework sees that the context is authenticated and allows the request to proceed to the protected API. 
 
 ### Scenario C: Access Denied
 If the client tries to access a protected API without a token, the custom filter cannot verify them. \
-The SecurityContextHolder remains unauthenticated (empty), and Spring Security blocks the request, returning an unauthorized error. \
+The SecurityContextHolder remains unauthenticated (empty), and Spring Security blocks the request, returning an unauthorized error. 
