@@ -184,18 +184,43 @@ API reposne if user was attepmpted to be created without an email Id.
 
 ## Understanding JWT (JSON Web Token) Authentication
 ---
-1. Why use JWT instead of Basic Authentication?
+1. Why use JWT instead of Basic Authentication? \
 Basic authentication is less secure for public-facing clients (like React/Angular apps) because it requires sending the raw username and password with every single request. \
 JWT authentication provides a more secure, stateless way to authenticate API requests.
 
-2. What is a JWT?
-A JWT is an encoded string that securely transmits information between parties. It consists of three parts separated by dots (.): \
-• Header: Contains metadata like the type of token (JWT) and the encryption algorithm used.
+2. What is a JWT? \
+A JWT is an encoded string that securely transmits information between parties. It consists of three parts separated by dots (.):\
+**`Header.Payload.Signature`**
 
-• Payload (Claims): Contains the actual data/information you want to store (e.g., User ID, roles, issue date). Note: Do not put sensitive data like passwords here, as it can be decoded by anyone.
-• Signature: The most critical part. It is created using the encoded header, encoded payload, and a secret key. It ensures the token has not been tampered with and verifies the sender's identity.
+Below is the Raw Token (What the Client Sees)
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlJpc2hhYmgiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3MTUxMjM0NTZ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+```
+• Header: Contains metadata like the type of token (JWT) and the encryption algorithm used. \
+`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9`
+```Json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+• Payload (Claims): Contains the actual data/information you want to store (e.g., User ID, roles, issue date). Note: Do not put sensitive data like passwords here, as it can be decoded by anyone. \
+`eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlJpc2hhYmgiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3MTUxMjM0NTZ9`
+```Json
+{
+  "sub": "1234567890",
+  "name": "Rishabh",
+  "role": "ADMIN",
+  "iat": 1715123456
+}
+```
+• Signature: The most critical part. It is created using the encoded header, encoded payload, and a secret key. It ensures the token has not been tampered with and verifies the sender's identity. \
+`SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`
 
-4. The JWT Workflow (Client & Backend Interaction)
+If a hacker intercepts the token and tries to change their "role": "USER" to "role": "ADMIN", the payload's Base64 string changes. When the backend receives this altered token, it recalculates the signature.  \
+Because the payload changed (and the hacker doesn't know the Secret Key to generate a new valid signature), the recalculated signature won't match the signature on the token. The backend immediately rejects it as tampered! 
+
+3. The JWT Workflow (Client & Backend Interaction)
    
 ### Scenario A: Generating the Token (Login)
 The client (e.g., React app) sends the username and password to a dedicated login API endpoint. \
