@@ -250,7 +250,7 @@ In a Stateless app, the server has no memory of the token it gave you. \
 • The Problem: If a user clicks "Logout," but an attacker steals their token 5 minutes earlier, that attacker can still use the token until it expires. The server has no way to "cancel" it.
 
 
-# 🛠️ The Three Common Solutions
+## 🛠️ The Three Common Solutions
 Since we can't "delete" a token from the user's hand, we have to use these strategies:
 
 1. **The "Clean Your Own Room" Method (Client-Side)** 
