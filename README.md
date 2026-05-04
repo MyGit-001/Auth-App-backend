@@ -242,42 +242,42 @@ The SecurityContextHolder remains unauthenticated (empty), and Spring Security b
 
 👉 In a typical Spring Boot app using JWT (JSON Web Tokens), you are working in a Stateless Architecture. This means the server is like a shopkeeper with amnesia—it doesn't remember who you are once you walk out the door; it only trusts you because you are carrying a valid, signed "Receipt" (the Token). This creates a specific problem when it comes to logging out.
 
-🛑 The Logout Problem: The "Unstoppable" Token
+## 🛑 The Logout Problem: The "Unstoppable" Token
 In a Stateful app (using Sessions), logging out is easy: the server deletes the session ID from its memory, and the user is instantly kicked out. \
 In a Stateless app, the server has no memory of the token it gave you. \
-	• The token is self-contained. \
-	• As long as the token hasn't expired and the signature is valid, the server must accept it. \
-	• The Problem: If a user clicks "Logout," but an attacker steals their token 5 minutes earlier, that attacker can still use the token until it expires. The server has no way to "cancel" it.
+• The token is self-contained. \
+• As long as the token hasn't expired and the signature is valid, the server must accept it. \
+• The Problem: If a user clicks "Logout," but an attacker steals their token 5 minutes earlier, that attacker can still use the token until it expires. The server has no way to "cancel" it.
 
 
 # 🛠️ The Three Common Solutions
 Since we can't "delete" a token from the user's hand, we have to use these strategies:
 
 1. **The "Clean Your Own Room" Method (Client-Side)** \
-	• How it works: When the user clicks logout, the frontend (React/Angular/Mobile) simply deletes the token from its local storage. \
-	• The Flaw: This is "fake" security. The token still exists and is valid in the "wild." If someone else has a copy of it, they can still use it. \
+	* How it works: When the user clicks logout, the frontend (React/Angular/Mobile) simply deletes the token from its local storage. \
+	* The Flaw: This is "fake" security. The token still exists and is valid in the "wild." If someone else has a copy of it, they can still use it. \
 
 2. **The Blacklist Method (The "Banned List")** \
-	• How it works: You create a fast database (like Redis). When a user logs out, you take their token and put it on a "Blacklist" until its original expiry time. \
-	• The Check: Every time a request comes in, the server checks: "Is this token valid? YES. Is it on the Blacklist? NO." \
-	• The Trade-off: You are now slightly "Stateful" again because the server has to remember which tokens are bad. \
+	* How it works: You create a fast database (like Redis). When a user logs out, you take their token and put it on a "Blacklist" until its original expiry time. \
+	* The Check: Every time a request comes in, the server checks: "Is this token valid? YES. Is it on the Blacklist? NO." \
+	* The Trade-off: You are now slightly "Stateful" again because the server has to remember which tokens are bad. \
 
 3. **Short Lifespans + Refresh Tokens** \
-	• How it works: You give the user an Access Token that only lasts 5 or 15 minutes. You also give them a Refresh Token that lasts days. \
-	• Logout: When the user logs out, you delete the Refresh Token from your database. \
-	• Result: The user might still be able to use the Access Token for a maximum of 5–15 minutes, but they can never get a new one.
-	• Yes, we are consuming space. But here is why it’s different (and better) than traditional session management:
+	* How it works: You give the user an Access Token that only lasts 5 or 15 minutes. You also give them a Refresh Token that lasts days. \
+	* Logout: When the user logs out, you delete the Refresh Token from your database. \
+	* Result: The user might still be able to use the Access Token for a maximum of 5–15 minutes, but they can never get a new one.
+	* Yes, we are consuming space. But here is why it’s different (and better) than traditional session management:
 
-	_1. Where do we store it?_ \
+    _3.1. Where do we store it?_ \
 	We don't usually store these in our main, heavy SQL database (like MySQL or PostgreSQL). We store them in a Fast In-Memory Store like Redis. Why? Redis is incredibly fast and allows us to set a TTL (Time To Live). \
 	Automatic Cleanup: When a token is set to expire in 7 days, Redis automatically deletes it from memory the second that time is up. We don't have to write "cleanup" scripts. \
 
-    _2. What exactly are we storing?_ \
+    _3.2. What exactly are we storing?_ \
 	We aren't usually storing the massive, long JWT string itself. We often store a Token ID (jti) or a User ID mapped to a version number. \
 	Traditional Session: Stores the entire user profile, permissions, and metadata in the server's RAM for every single active user. \
 	Refresh Token Storage: Only stores a tiny "Reference Key" (a few bytes). The "ID Badge" (Access Token) is still carried by the user. \
 
-	_3. Why it’s still considered "Stateless-ish"_ \
+	_3.3. Why it’s still considered "Stateless-ish"_ \
 	Even though we are storing something, the architecture remains "Stateless" because: \
 	The Access Token (the one used for every API call) is never stored. The server validates it mathematically using a Secret Key. \
 	The Database is only hit once in a while. **`You only check the database when the 15-minute Access Token expires and the user needs a new one. For the other 99% of requests, the server doesn't look at the database at all`**.
