@@ -282,7 +282,7 @@ Since we can't "delete" a token from the user's hand, we have to use these strat
 	The Access Token (the one used for every API call) is never stored. The server validates it mathematically using a Secret Key. \
 	The Database is only hit once in a while. **`You only check the database when the 15-minute Access Token expires and the user needs a new one. For the other 99% of requests, the server doesn't look at the database at all`**.
 
-## understand three layers: the SecurityContextHolder, the SecurityContext, and the Authentication object
+## Understanding three layers: the SecurityContextHolder, the SecurityContext, and the Authentication object
 ---
 1. SecurityContextHolder (The Storage Location) \
 `What it is:` The "Global Filing Cabinet." It is the top-level object where Spring Security stores all security details. \
